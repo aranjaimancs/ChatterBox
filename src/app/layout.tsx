@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Slottd",
   description: "Generate shareable availability from your Google Calendar",
+  verification: {
+    google: "yir07KQp-B5uKuAXXe55JQGrO4xFcRJk66Ur0n5k1SM",
+  },
 };
 
 export default function RootLayout({
