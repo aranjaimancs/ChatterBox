@@ -8,7 +8,7 @@ export default async function Home() {
 
   return (
     <main
-      className="flex min-h-screen flex-col items-center justify-center px-4 py-16"
+      className="flex min-h-screen flex-col items-center justify-center px-4 py-8 sm:py-16"
       style={{ background: "var(--bg)" }}
     >
       {session ? (
@@ -16,7 +16,7 @@ export default async function Home() {
       ) : (
         <div className="flex flex-col items-center text-center max-w-sm w-full">
           <h1 className="text-4xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-            Chatter<span style={{ color: "var(--accent)" }}>Box</span>
+            Slott<span style={{ color: "var(--accent)" }}>d</span>
           </h1>
           <p
             className="mt-3 text-sm leading-relaxed"

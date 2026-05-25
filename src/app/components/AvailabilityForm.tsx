@@ -40,7 +40,7 @@ const baseInput: React.CSSProperties = {
   border: "1px solid var(--border-strong)",
   borderRadius: "8px",
   padding: "8px 12px",
-  fontSize: "14px",
+  fontSize: "16px",
   color: "var(--text)",
   outline: "none",
   transition: "border-color 0.15s",

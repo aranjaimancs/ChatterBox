@@ -29,14 +29,14 @@ export function MainApp({ userEmail }: Props) {
   }, [menuOpen])
 
   return (
-    <div className="w-full max-w-lg">
+    <div className="w-full max-w-lg px-0 sm:px-0">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         <span
           className="text-lg font-bold tracking-tight"
           style={{ color: "var(--text)" }}
         >
-          Chatter<span style={{ color: "var(--accent)" }}>Box</span>
+          Slott<span style={{ color: "var(--accent)" }}>d</span>
         </span>
 
         {/* Avatar + dropdown */}
@@ -44,7 +44,7 @@ export function MainApp({ userEmail }: Props) {
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold transition-opacity hover:opacity-80"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-opacity hover:opacity-80"
             style={{
               background: "#1e1e1e",
               border: "1px solid var(--border-strong)",
@@ -58,7 +58,7 @@ export function MainApp({ userEmail }: Props) {
 
           {menuOpen && (
             <div
-              className="absolute right-0 top-10 w-52 rounded-xl py-1 z-10"
+              className="absolute right-0 top-10 w-48 rounded-xl py-1 z-10"
               style={{
                 background: "#1a1a1a",
                 border: "1px solid var(--border-strong)",
@@ -96,7 +96,7 @@ export function MainApp({ userEmail }: Props) {
 
       {/* Card */}
       <div
-        className="rounded-2xl"
+        className="rounded-none sm:rounded-2xl -mx-4 sm:mx-0"
         style={{
           background: "var(--card)",
           border: "1px solid var(--border)",
@@ -119,7 +119,7 @@ export function MainApp({ userEmail }: Props) {
                 key={id}
                 onClick={() => setActiveTab(id)}
                 type="button"
-                className="px-5 py-3.5 text-sm font-medium transition-colors relative"
+                className="flex-1 text-center px-3 py-3.5 text-sm font-medium transition-colors relative"
                 style={{
                   color: isActive ? "var(--text)" : "var(--text-muted)",
                   borderBottom: isActive
@@ -136,7 +136,7 @@ export function MainApp({ userEmail }: Props) {
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {activeTab === "availability" ? <AvailabilityForm /> : <ParseMatch />}
         </div>
       </div>

@@ -18,6 +18,13 @@
   --amber-bg: rgba(245, 158, 11, 0.08);
   --amber-border: rgba(245, 158, 11, 0.2);
   --red: #ef4444;
+  --surface-2: #1e1e1e;
+  --border-2: #2a2a2a;
+}
+
+/* Prevent double-tap zoom on interactive elements */
+button, a, select, input, textarea {
+  touch-action: manipulation;
 }
 
 @theme inline {

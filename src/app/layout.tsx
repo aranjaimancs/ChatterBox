@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ChatterBox",
+  title: "Slottd",
   description: "Generate shareable availability from your Google Calendar",
 };
 

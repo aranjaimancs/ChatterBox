@@ -88,11 +88,15 @@ function SlotCard({
   )
 }
 
+const LIMIT_OPTIONS = [1, 2, 3, 5] as const
+type LimitOption = (typeof LIMIT_OPTIONS)[number]
+
 export function ParseMatch() {
   const [emailText, setEmailText] = useState("")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ParseResult | null>(null)
   const [error, setError] = useState("")
+  const [limit, setLimit] = useState<LimitOption>(3)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -106,7 +110,7 @@ export function ParseMatch() {
       const res = await fetch("/api/parse-match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emailText, timezone }),
+        body: JSON.stringify({ emailText, timezone, limit }),
       })
 
       let data: Record<string, unknown>
@@ -147,12 +151,13 @@ export function ParseMatch() {
             placeholder="Hey! Are you free for dinner this Saturday or Sunday evening? Would love to catch up!"
             required
             rows={5}
-            className="w-full rounded-lg px-3 py-2.5 text-sm leading-relaxed resize-none transition-colors"
+            className="w-full rounded-lg px-3 py-2.5 leading-relaxed resize-none transition-colors"
             style={{
               background: "var(--input)",
               border: "1px solid var(--border-strong)",
               color: "var(--text)",
               outline: "none",
+              fontSize: "16px",
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = "var(--accent)"
@@ -161,6 +166,32 @@ export function ParseMatch() {
               e.currentTarget.style.borderColor = "var(--border-strong)"
             }}
           />
+        </div>
+
+        {/* Slot limit */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+            Show up to
+          </span>
+          <select
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value) as LimitOption)}
+            className="rounded-md text-sm"
+            style={{
+              background: "var(--input)",
+              border: "1px solid var(--border-strong)",
+              color: "var(--text)",
+              padding: "3px 8px",
+              outline: "none",
+              cursor: "pointer",
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)" }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)" }}
+          >
+            {LIMIT_OPTIONS.map((n) => (
+              <option key={n} value={n}>{n} {n === 1 ? "result" : "results"}</option>
+            ))}
+          </select>
         </div>
 
         <button

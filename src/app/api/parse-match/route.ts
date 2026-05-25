@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import Anthropic from "@anthropic-ai/sdk"
+import OpenAI from "openai"
 import { google } from "googleapis"
 import type { calendar_v3 } from "googleapis"
 
-const anthropic = new Anthropic()
+const openai = new OpenAI()
 
 const SYSTEM_PROMPT = `You are a scheduling assistant that extracts meeting proposals from email text.
 
@@ -271,34 +271,30 @@ async function handlePost(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  let body: { emailText?: string; timezone?: string }
+  let body: { emailText?: string; timezone?: string; limit?: number }
   try {
     body = await request.json()
   } catch {
     return Response.json({ error: "Invalid request body" }, { status: 400 })
   }
 
-  const { emailText, timezone = "UTC" } = body
+  const { emailText, timezone = "UTC", limit } = body
+  // Total slots to surface (bestMatch + alternatives combined); null = no cap
+  const slotLimit = typeof limit === "number" && limit > 0 ? limit : null
   if (!emailText?.trim()) {
     return Response.json({ error: "Email text is required" }, { status: 400 })
   }
 
   const today = new Date().toISOString().slice(0, 10)
 
-  // Call Anthropic with prompt caching on the system prompt
+  // Call OpenAI
   let aiText: string
   try {
-    const aiResponse = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const aiResponse = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
       max_tokens: 1024,
-      system: [
-        {
-          type: "text",
-          text: SYSTEM_PROMPT,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
       messages: [
+        { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
           content: `Today's date: ${today} (${timezone})\n\nEmail text:\n${emailText.trim()}`,
@@ -306,22 +302,22 @@ async function handlePost(request: Request) {
       ],
     })
 
-    const block = aiResponse.content[0]
-    if (block.type !== "text") {
+    const content = aiResponse.choices[0]?.message?.content
+    if (!content) {
       return Response.json(
         { error: "Unexpected response from AI" },
         { status: 500 }
       )
     }
-    aiText = block.text
+    aiText = content
   } catch (err) {
-    if (err instanceof Anthropic.RateLimitError) {
+    if (err instanceof OpenAI.RateLimitError) {
       return Response.json(
         { error: "AI service is busy. Please try again shortly." },
         { status: 429 }
       )
     }
-    if (err instanceof Anthropic.APIError) {
+    if (err instanceof OpenAI.APIError) {
       return Response.json({ error: `AI service error: ${err.message}` }, { status: 500 })
     }
     const message = err instanceof Error ? err.message : String(err)
@@ -453,9 +449,11 @@ async function handlePost(request: Request) {
   }
 
   const bestMatch = freeSlots[0] ?? null
-  let alternatives: TimeSlot[] = freeSlots.slice(1)
+  // How many alternatives to keep after the best match
+  const altCap = slotLimit === null ? Infinity : slotLimit - (bestMatch ? 1 : 0)
+  let alternatives: TimeSlot[] = freeSlots.slice(1, altCap === Infinity ? undefined : altCap + 1)
 
-  // If no free slots, find alternatives from calendar
+  // If no free slots among proposed times, search the calendar for alternatives
   if (!bestMatch) {
     const [filterStartH, filterStartM] = (
       parsed.contextualFilter?.startAfter ?? "09:00"
@@ -478,9 +476,10 @@ async function handlePost(request: Request) {
       d.setUTCDate(d.getUTCDate() + 1)
     }
 
+    const maxAlts = slotLimit ?? 3
     const altSlots: TimeSlot[] = []
     for (const day of days) {
-      if (altSlots.length >= 3) break
+      if (altSlots.length >= maxAlts) break
       const freeBlocks = getFreeBlocksForDay(
         day,
         windowStartMin,
