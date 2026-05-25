@@ -160,7 +160,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="text-sm leading-relaxed">
               If you have any questions about this privacy policy, please reach out at{" "}
-              <span style={{ color: "var(--accent)" }}>slottd.app@gmail.com</span>.
+              <span style={{ color: "var(--accent)" }}>aranjaiman@gmail.com</span>.
             </p>
           </section>
         </div>
