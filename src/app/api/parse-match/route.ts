@@ -4,7 +4,9 @@ import OpenAI from "openai"
 import { google } from "googleapis"
 import type { calendar_v3 } from "googleapis"
 
-const openai = new OpenAI()
+function getOpenAI() {
+  return new OpenAI()
+}
 
 const SYSTEM_PROMPT = `You are a scheduling assistant that extracts meeting proposals from email text.
 
@@ -290,7 +292,7 @@ async function handlePost(request: Request) {
   // Call OpenAI
   let aiText: string
   try {
-    const aiResponse = await openai.chat.completions.create({
+    const aiResponse = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       max_tokens: 1024,
       messages: [
