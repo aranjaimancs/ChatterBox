@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { SignInButton } from "./components/SignInButton"
 import { MainApp } from "./components/MainApp"
+import Link from "next/link"
 
 export default async function Home() {
   const session = await getServerSession(authOptions)
@@ -27,6 +28,15 @@ export default async function Home() {
           <SignInButton />
           <p className="mt-4 text-xs" style={{ color: "var(--text-dim)" }}>
             Read-only access · No calendar data stored
+          </p>
+          <p className="mt-3 text-xs" style={{ color: "var(--text-dim)" }}>
+            <Link
+              href="/privacy"
+              style={{ color: "var(--text-dim)" }}
+              className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+            >
+              Privacy Policy
+            </Link>
           </p>
         </div>
       )}
