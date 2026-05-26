@@ -5,7 +5,7 @@ import { google } from "googleapis"
 import type { calendar_v3 } from "googleapis"
 
 function getOpenAI() {
-  return new OpenAI()
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 }
 
 const SYSTEM_PROMPT = `You are a scheduling assistant that extracts meeting proposals from email text.
