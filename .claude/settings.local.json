@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"const { google } = require\\('googleapis'\\); const cal = google.calendar\\('v3'\\); console.log\\(Object.keys\\(cal.events\\)\\)\")",
+      "Bash(grep -r 'Schema$Event' node_modules/googleapis/build/src/apis/calendar/v3.d.ts)",
+      "Bash(npm run:*)",
+      "Skill(claude-api)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(git remote:*)",
+      "Bash(grep -E \"^/c/Users/aranj/chatterbox/[^/]*\\\\.\\(ts|tsx|js|jsx\\)$|app/|src/\")"
+    ]
+  }
+}

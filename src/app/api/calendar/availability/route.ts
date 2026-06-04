@@ -90,13 +90,21 @@ export async function GET(request: Request) {
   const timeMin = `${startDate}T00:00:00.000Z`
   const endDatePlusOne = new Date(`${endDate}T00:00:00Z`)
   endDatePlusOne.setUTCDate(endDatePlusOne.getUTCDate() + 1)
-  const timeMax = endDatePlusOne.toISOString()
 
   // Fetch events from every calendar the user can read — using events.list (not
   // freebusy) so that events marked "Free"/transparent are still treated as busy
-  const calListRes = await calendar.calendarList.list({ minAccessRole: "reader" })
-  const calIds = (calListRes.data.items ?? []).filter((c) => c.id).map((c) => c.id!)
-  if (!calIds.includes("primary")) calIds.unshift("primary")
+  let calIds: string[]
+  try {
+    const calListRes = await calendar.calendarList.list({ minAccessRole: "reader" })
+    calIds = (calListRes.data.items ?? []).filter((c) => c.id).map((c) => c.id!)
+    if (!calIds.includes("primary")) calIds.unshift("primary")
+  } catch (err: unknown) {
+    const status = (err as { status?: number })?.status
+    if (status === 401 || status === 403) {
+      return Response.json({ error: "Calendar access denied. Please sign out and sign back in." }, { status: 401 })
+    }
+    return Response.json({ error: "Failed to connect to Google Calendar. Please try again." }, { status: 502 })
+  }
 
   const eventArrays = await Promise.all(
     calIds.map(async (calId) => {

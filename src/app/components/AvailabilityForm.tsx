@@ -125,10 +125,15 @@ export function AvailabilityForm() {
 
     try {
       const res = await fetch(`/api/calendar/availability?${params}`)
-      const data = await res.json()
+      let data: { error?: string; availability?: string } = {}
+      try {
+        data = await res.json()
+      } catch {
+        // response wasn't JSON (e.g. server crash returned HTML)
+      }
 
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong.")
+        setError(data.error ?? "Something went wrong. Please try again.")
       } else {
         setResult(data.availability || "No availability found for the selected range.")
       }
