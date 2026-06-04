@@ -101,6 +101,12 @@ function TimeInput({
 const LIMIT_OPTIONS = [3, 5, 7, 10] as const
 type LimitOption = (typeof LIMIT_OPTIONS)[number]
 
+const BUFFER_OPTIONS = [0, 5, 10, 15, 20, 30] as const
+type BufferOption = (typeof BUFFER_OPTIONS)[number]
+
+const IN_PERSON_BUFFER_OPTIONS = [15, 20, 30, 45, 60] as const
+type InPersonBufferOption = (typeof IN_PERSON_BUFFER_OPTIONS)[number]
+
 export function AvailabilityForm() {
   const [startDate, setStartDate] = useState(todayStr)
   const [endDate, setEndDate] = useState(() => plusDaysStr(6))
@@ -108,6 +114,8 @@ export function AvailabilityForm() {
   const [endTime, setEndTime] = useState("17:00")
   const [limitEnabled, setLimitEnabled] = useState(false)
   const [limitCount, setLimitCount] = useState<LimitOption>(5)
+  const [buffer, setBuffer] = useState<BufferOption>(15)
+  const [inPersonBuffer, setInPersonBuffer] = useState<InPersonBufferOption>(30)
   const [result, setResult] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -122,6 +130,8 @@ export function AvailabilityForm() {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     const params = new URLSearchParams({ startDate, endDate, startTime, endTime, timezone })
     if (limitEnabled) params.set("limit", String(limitCount))
+    params.set("buffer", String(buffer))
+    params.set("inPersonBuffer", String(inPersonBuffer))
 
     try {
       const res = await fetch(`/api/calendar/availability?${params}`)
@@ -174,6 +184,42 @@ export function AvailabilityForm() {
           <div>
             <Label>Day ends</Label>
             <TimeInput value={endTime} onChange={setEndTime} required />
+          </div>
+        </div>
+
+        {/* Buffer controls */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Buffer (virtual)</Label>
+            <select
+              value={buffer}
+              onChange={(e) => setBuffer(Number(e.target.value) as BufferOption)}
+              style={{ ...baseInput, cursor: "pointer" }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)" }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)" }}
+            >
+              {BUFFER_OPTIONS.map((n) => (
+                <option key={n} value={n}>
+                  {n === 0 ? "No buffer" : `${n} min`}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label>Buffer (in-person)</Label>
+            <select
+              value={inPersonBuffer}
+              onChange={(e) => setInPersonBuffer(Number(e.target.value) as InPersonBufferOption)}
+              style={{ ...baseInput, cursor: "pointer" }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)" }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)" }}
+            >
+              {IN_PERSON_BUFFER_OPTIONS.map((n) => (
+                <option key={n} value={n}>
+                  {`${n} min`}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

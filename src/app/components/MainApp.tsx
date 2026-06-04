@@ -135,9 +135,14 @@ export function MainApp({ userEmail }: Props) {
           })}
         </div>
 
-        {/* Content */}
+        {/* Content — keep both mounted so state is preserved when switching tabs */}
         <div className="p-4 sm:p-6">
-          {activeTab === "availability" ? <AvailabilityForm /> : <ParseMatch />}
+          <div style={{ display: activeTab === "availability" ? "block" : "none" }}>
+            <AvailabilityForm />
+          </div>
+          <div style={{ display: activeTab === "parse-match" ? "block" : "none" }}>
+            <ParseMatch />
+          </div>
         </div>
       </div>
     </div>

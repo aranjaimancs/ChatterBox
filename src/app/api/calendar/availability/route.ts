@@ -69,6 +69,9 @@ export async function GET(request: Request) {
   const limitParam = searchParams.get("limit")
   const limit = limitParam ? parseInt(limitParam, 10) : null
 
+  const bufferMin = parseInt(searchParams.get("buffer") ?? "0", 10) || 0
+  const inPersonBufferMin = parseInt(searchParams.get("inPersonBuffer") ?? "0", 10) || bufferMin
+
   const [startHour, startMinute] = startTime.split(":").map(Number)
   const [endHour, endMinute] = endTime.split(":").map(Number)
   const windowStartMin = startHour * 60 + startMinute
@@ -136,7 +139,12 @@ export async function GET(request: Request) {
           endDate: event.end?.date ?? event.start.date,
         })
       } else if (event.start?.dateTime && event.end?.dateTime) {
-        busyPeriods.push({ start: new Date(event.start.dateTime), end: new Date(event.end.dateTime) })
+        const hasLocation = Boolean(event.location?.trim())
+        const buf = hasLocation ? Math.max(inPersonBufferMin, bufferMin) : bufferMin
+        busyPeriods.push({
+          start: new Date(new Date(event.start.dateTime).getTime() - buf * 60_000),
+          end: new Date(new Date(event.end.dateTime).getTime() + buf * 60_000),
+        })
       }
     }
   }
